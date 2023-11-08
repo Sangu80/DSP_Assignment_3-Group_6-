@@ -21,3 +21,9 @@ To run this app, you'll need Python 3.9 and pip installed.
 ## Usage
 
 After running the app, navigate to the Streamlit interface in your web browser and follow the instructions within the app to upload and analyze your CSV data.
+
+Group Members:
+-> Anna Roy
+-> Sangmeshwar Kanaje
+-> Savanth Nair
+-> Junjie Zou
