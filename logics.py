@@ -91,13 +91,6 @@ class DateColumn:
 
 
 
-
-        # if self.df is not None:
-        #     date_cols = []
-        #     date_cols = [col for col in self.df.columns if pd.api.types.is_datetime64_any_dtype(self.df[col])]
-        #     print("Datetime columns:", date_cols)
-        # # return date_cols
-
     def set_data(self, col_name):
         """
         --------------------
@@ -124,18 +117,18 @@ class DateColumn:
                 # Compute requested information here
                 # You can call other methods or perform computations here
                 # For example:
-                # self.convert_serie_to_date()
-                # self.set_unique()
-                # self.set_missing()
-                # self.set_min()
-                # self.set_max()
-                # self.set_weekend()
-                # self.set_weekday()
-                # self.set_future()
-                # self.set_empty_1900()
-                # self.set_empty_1970()
-                # self.set_barchart()
-                # self.set_frequent()
+                self.convert_serie_to_date()
+                self.set_unique()
+                self.set_missing()
+                self.set_min()
+                self.set_max()
+                self.set_weekend()
+                self.set_weekday()
+                self.set_future()
+                self.set_empty_1900()
+                self.set_empty_1970()
+                self.set_barchart()
+                self.set_frequent()
 
     def convert_serie_to_date(self):
         """
@@ -156,7 +149,8 @@ class DateColumn:
 
         """
         if not self.is_serie_none():
-            self.serie = pd.to_datetime(self.serie)
+            self.serie = pd.to_datetime(self.serie,dayfirst=True)
+
 
     def is_serie_none(self):
         """
@@ -198,6 +192,7 @@ class DateColumn:
         """
         if not self.is_serie_none():
             self.n_unique = len(self.serie.unique())
+            return self.n_unique
 
     def set_missing(self):
         """
@@ -219,6 +214,7 @@ class DateColumn:
         """
         if not self.is_serie_none():
             self.n_missing = self.serie.isna().sum()
+            return self.n_missing
 
     def set_min(self):
         """
@@ -239,7 +235,8 @@ class DateColumn:
 
         """
         if not self.is_serie_none():
-            self.col_max = self.serie.min()
+            self.col_min = self.serie.min()
+            return self.col_min
 
     def set_max(self):
         """
@@ -261,6 +258,7 @@ class DateColumn:
         """
         if not self.is_serie_none():
             self.col_max = self.serie.max()
+            return self.col_max
 
     def set_weekend(self):
         """
@@ -281,7 +279,8 @@ class DateColumn:
 
         """
         if not self.is_serie_none():
-            self.n_weekend = len([d for d in self.serie if d.weekday() >= 5])
+            self.n_weekend = len([d for d in self.serie if d.weekday() > 5])
+            return self.n_weekend
 
     def set_weekday(self):
         """
@@ -302,7 +301,8 @@ class DateColumn:
 
         """
         if not self.is_serie_none():
-            self.n_weekday = len([d for d in self.serie if d.weekday() < 5])
+            self.n_weekday = len([d for d in self.serie if d.weekday() <= 5])
+            return self.n_weekday
 
     def set_future(self):
         """
@@ -325,6 +325,7 @@ class DateColumn:
         if not self.is_serie_none():
             today = datetime.datetime.now()
             self.n_future = len([d for d in self.serie if d > today])
+            return self.n_future
 
     def set_empty_1900(self):
         """
@@ -346,6 +347,7 @@ class DateColumn:
         """
         if not self.is_serie_none():
             self.n_empty_1900 = len([d for d in self.serie if d == datetime.datetime(1900, 1, 1)])
+            return self.n_empty_1900
 
     def set_empty_1970(self):
         """
@@ -367,6 +369,7 @@ class DateColumn:
         """
         if not self.is_serie_none():
             self.n_empty_1970 = len([d for d in self.serie if d == datetime.datetime(1970, 1, 1)])
+            return self.n_empty_1970
 
     def set_barchart(self):
         """
@@ -387,11 +390,14 @@ class DateColumn:
 
         """
         if not self.is_serie_none():
+
+
             chart = alt.Chart(self.serie).mark_bar().encode(
                 x=alt.X('yearmonth(date):O', title='Date'),
                 y=alt.Y('count():Q', title='Count')
             )
-            self.barchart = chart
+            # self.barchart = chart
+            return self.barchart
 
     def set_frequent(self, end=20):
         """
@@ -413,18 +419,23 @@ class DateColumn:
 
         """
         if self.serie is None:
-            print("The serie is not initialized. Load a column first.")
+            # print("The serie is not initialized. Load a column first.")
             return
 
         if not isinstance(end, int) or end <= 0:
-            print("Invalid 'end' parameter. It should be a positive integer.")
+            # print("Invalid 'end' parameter. It should be a positive integer.")
             return
 
         frequent_series = self.serie.value_counts().head(end)
-        self.frequent = pd.DataFrame({'value': frequent_series.index, 'occurrence': frequent_series.values})
+        relative_frequency = frequent_series / len(self.serie)  # Calculate relative frequency
+        self.frequent = pd.DataFrame({'value': frequent_series.index,
+                                      'occurrence': frequent_series.values,
+                                      'percentage': relative_frequency * 100}, index=frequent_series.index).reset_index()
 
-        print(f"The {end} most frequent values in the series:")
-        print(self.frequent)
+
+        # print(f"The {end} most frequent values in the series:")
+        # print(self.frequent)
+        return self.frequent
 
     def get_summary(self):
         """
@@ -452,3 +463,15 @@ class DateColumn:
                       self.n_future, self.n_empty_1900, self.n_empty_1970]
         })
         return summary
+
+        # summary = pd.DataFrame({
+        #     'Description': ['Number of Unique Values', 'Number of Missing Values', 'Minimum Date', 'Maximum Date',
+        #                     'Number of Weekend Dates', 'Number of Weekday Dates', 'Number of Future Dates',
+        #                     'Number of Dates Equal to 1900-01-01', 'Number of Dates Equal to 1970-01-01'],
+        #     'Value': [self.n_unique, self.n_missing, self.col_min.to_string(), self.col_max.to_string(), self.n_weekend,
+        #               self.n_weekday,
+        #               self.n_future, self.n_empty_1900, self.n_empty_1970]
+        # })
+        # return summary
+
+
