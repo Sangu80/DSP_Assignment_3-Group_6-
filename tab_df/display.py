@@ -1,14 +1,20 @@
-
 import streamlit as st
-from logics import Dataset
 
+from logics import Dataset
 
 def display_tab_df_content(file_path):
     # Instantiate the Dataset class and set the data
     dataset = Dataset(file_path)
-    dataset.set_data()
+    dataset.set_df() 
+    dataset.set_data() 
+    dataset.set_dimensions()
+    dataset.set_numeric()
+    dataset.set_columns()
 
-    st.title("Data Analysis - DataFrame")
+    # Store the dataset in st.session_state
+    st.session_state['dataset'] = dataset
+
+    st.title("DataFrame")
 
     # Expander for displaying dataset summary
     with st.expander("Dataset Summary"):
@@ -30,4 +36,3 @@ def display_tab_df_content(file_path):
     # Display column information
     st.header("Column Information")
     st.table(dataset.table)
-
