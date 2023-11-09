@@ -1,20 +1,40 @@
 import streamlit as st
-from .logics import load_data, get_numeric_columns, get_descriptive_stats, get_histogram, get_boxplot
+from tab_num.logics import NumericColumn
+import pandas as pd
 
-def show_numeric_tab(uploaded_file):
-    df = load_data(uploaded_file)
-    numeric_columns = get_numeric_columns(df)
-    
-    st.subheader('Numeric Data Analysis')
-    numeric_column = st.selectbox('Select the Numeric Column', numeric_columns)
-    if numeric_column:
-        st.write('Descriptive Statistics')
-        st.table(get_descriptive_stats(df, numeric_column))
+def display_tab_num_content(file_path=None, df=None):
+    # Check if a file path is provided and load the dataframe if it's not already provided
+    if file_path is not None and df is None:
+        df = pd.read_csv(file_path)
 
-        st.write('Histogram')
-        hist_fig = get_histogram(df, numeric_column)
-        st.pyplot(hist_fig)
+    # Check if the dataframe is loaded
+    if df is not None:
+        # Create an instance of NumericColumn class
+        num_col = NumericColumn(df=df)
 
-        st.write('Boxplot')
-        box_fig = get_boxplot(df, numeric_column)
-        st.pyplot(box_fig)
+        # Find the numeric columns in the dataframe
+        num_col.find_num_cols()
+
+        # Display a select box with the list of numeric columns found
+        selected_col = st.selectbox("Select a Numeric Column", num_col.cols_list)
+
+        # Once the user selects a column, compute all the information to be displayed
+        if selected_col:
+            num_col.set_data(selected_col)
+
+            # Display an expander with the summary table
+            with st.expander("Summary", expanded=True):
+                summary_df = num_col.get_summary()
+                st.table(summary_df)
+
+            # Display a histogram chart of the selected numeric column
+            with st.expander("Histogram", expanded=True):
+                st.altair_chart(num_col.histogram, use_container_width=True)
+
+            # Display the most frequent values in the selected numeric column
+            with st.expander("Most Frequent Values", expanded=True):
+                st.write(num_col.frequent)
+
+    else:
+        # If no dataframe is loaded, display an error message
+        st.error("No DataFrame loaded. Please provide a file path or a DataFrame.")
