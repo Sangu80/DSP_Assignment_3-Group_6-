@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np 
 
 class Dataset:
     def __init__(self, file_path):
@@ -89,12 +90,20 @@ class Dataset:
             return self.df.sample(n)
 
 # Class method that computes the Dataframe containing the list of columns with their data types and memory usage and store the results in the relevant attribute (self.table) if self.df is not empty nor None
-
+    
     def set_table(self):
         if not self.is_df_none():
-            self.table = pd.DataFrame({'Column Name': self.cols_list})
-            self.table['Data Type'] = self.df.dtypes.values
-            self.table['Memory Usage (KB)'] = self.df.memory_usage(deep=True) / 1024
+          self.table = pd.DataFrame({'column': self.cols_list})
+          self.table['data_type'] = self.df.dtypes.values
+
+        # Calculate memory usage for each column
+          memory_usage = []
+          for column in self.cols_list:
+             mem = self.df[column].memory_usage(deep=True, index=False) / (1024 * 1024)  # Calculate memory usage in MB
+             memory_usage.append(f"{mem:.2f} MB")  # Format memory usage to display as "X.XX MB"
+
+          self.table['memory'] = memory_usage
+
 
 # Class method that formats all requested information from self.df to be displayed in the Dataframe tab of Streamlit app as a Pandas dataframe with 2 columns: Description and Value
 
@@ -107,5 +116,4 @@ class Dataset:
                       self.n_num_cols, self.n_text_cols]
         }
         return pd.DataFrame(summary_data, columns=['Description', 'Value'])
-
 

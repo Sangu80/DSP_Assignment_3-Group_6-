@@ -17,22 +17,24 @@ def display_tab_df_content(file_path):
     st.title("DataFrame")
 
     # Expander for displaying dataset summary
-    with st.expander("Dataset Summary"):
+    with st.expander("Dataframe"):
         summary_data = dataset.get_summary()
         st.table(summary_data)
 
     # Expander for selecting rows to display
-    with st.expander("Select Rows to Display"):
-        num_rows = st.slider("Select the number of rows to display", 5, 50, 5)
-        display_method = st.radio("Select the display method", ("head", "tail", "sample"))
+    with st.expander("Explore Dataframe"):
+        num_rows = st.slider("Select the number of rows to be displayed", 5, 50, 5)
+        display_method = st.radio("Exploration Method", ("Head", "Tail", "Sample"))
 
-        if display_method == "head":
+        st.header("Top Rows of Selected Table")
+
+        if display_method == "Head":
             st.dataframe(dataset.get_head(num_rows))
-        elif display_method == "tail":
+        elif display_method == "Tail":
             st.dataframe(dataset.get_tail(num_rows))
         else:
             st.dataframe(dataset.get_sample(num_rows))
 
     # Display column information
-    st.header("Column Information")
+    st.header("Columns")
     st.table(dataset.table)
