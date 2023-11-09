@@ -1,27 +1,40 @@
-# tab_text/display.py
 import streamlit as st
-from tab_text.logics import TextColumn
 
-def display_tab_text_content(file_path=None,df=None):
-    st.title("Text Serie Analysis")
+from logics import Dataset
 
-    text_column_instance = TextColumn(file_path, df)
-    text_column_instance.find_text_cols()
+def display_tab_df_content(file_path):
+    # Instantiate the Dataset class and set the data
+    dataset = Dataset(file_path)
+    dataset.set_df() 
+    dataset.set_data() 
+    dataset.set_dimensions()
+    dataset.set_numeric()
+    dataset.set_columns()
 
-    if not text_column_instance.cols_list:
-        st.warning("No text columns found in the dataset.")
-        return
+    # Store the dataset in st.session_state
+    st.session_state['dataset'] = dataset
 
-    selected_column = st.selectbox("Select a text column to explore:", text_column_instance.cols_list)
-    print(selected_column)
-    text_column_instance.set_data(selected_column)
+    st.title("DataFrame")
 
-    with st.expander("Text Column Analysis"):
-        st.subheader("Summary:")
-        st.table(text_column_instance.get_summary())
+    # Expander for displaying dataset summary
+    with st.expander("Dataframe"):
+        summary_data = dataset.get_summary()
+        st.table(summary_data)
 
-        st.subheader("Histogram:")
-        st.altair_chart(text_column_instance.barchart)
+    # Expander for selecting rows to display
+    with st.expander("Explore Dataframe"):
+        num_rows = st.slider("Select the number of rows to be displayed", 5, 50, 5)
+        display_method = st.radio("Exploration Method", ("Head", "Tail", "Sample"))
 
-        st.subheader("Top 20 Most Frequent Values:")
-        st.dataframe(text_column_instance.frequent)
+        st.header("Top Rows of Selected Table")
+
+        if display_method == "Head":
+            st.dataframe(dataset.get_head(num_rows))
+        elif display_method == "Tail":
+            st.dataframe(dataset.get_tail(num_rows))
+        else:
+            st.dataframe(dataset.get_sample(num_rows))
+
+    # Display column information
+    st.header("Columns")
+    st.table(dataset.table)

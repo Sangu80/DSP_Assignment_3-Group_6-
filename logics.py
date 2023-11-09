@@ -1,114 +1,119 @@
-# tab_text/logics.py
-
 import pandas as pd
-import altair as alt
+import numpy as np 
 
-class TextColumn:
-    def __init__(self, file_path=None, df=None):
+class Dataset:
+    def __init__(self, file_path):
         self.file_path = file_path
-        self.df = df
+        self.df = None
         self.cols_list = []
-        self.serie = None
-        self.n_unique = None
-        self.n_missing = None
-        self.n_empty  = None
-        self.n_mode = None
-        self.n_space = None
-        self.n_lower = None
-        self.n_upper = None
-        self.n_alpha = None
-        self.n_digit = None
-        self.barchart = alt.Chart()
-        self.frequent = pd.DataFrame(columns=['value', 'occurrence', 'percentage'])
+        self.n_rows = 0
+        self.n_cols = 0
+        self.n_duplicates = 0
+        self.n_missing = 0
+        self.n_num_cols = 0
+        self.n_text_cols = 0
+        self.table = None
 
-    def find_text_cols(self):
-        if self.df is None and self.file_path is not None:
-            self.df = pd.read_csv(self.file_path)
-
-        if self.df is not None:
-            self.cols_list = [col for col in self.df.columns if self.df[col].dtype == 'int64']
-
-    def set_data(self, col_name):
-        self.serie = self.df[col_name] if col_name in self.df.columns else None
-        if self.is_serie_none():
-            return
-
-        self.convert_serie_to_text()
-        self.set_unique()
+    def set_data(self):
+        self.set_df()
+        self.set_columns()
+        self.set_dimensions()
+        self.set_duplicates()
         self.set_missing()
-        self.set_empty()
-        self.set_mode()
-        self.set_whitespace()
-        self.set_lowercase()
-        self.set_uppercase()
-        self.set_alphabet()
-        self.set_digit()
-        self.set_barchart()
-        self.set_frequent()
+        self.set_numeric()
+        self.set_text()
+        self.set_table()
 
-    def convert_serie_to_text(self):
-        self.serie = self.serie.astype(str)
+# Class method that will load the uploaded CSV file as Pandas DataFrame and store it as attribute (self.df) if it hasn't been provided before.
 
-    def is_serie_none(self):
-        return self.serie is None or self.serie.empty
+    def set_df(self):
+        if self.df is None:
+            self.df = pd.read_csv(self.file_path)    
 
-    def set_unique(self):
-        self.n_unique = self.serie.nunique()
+
+# Class method that checks if self.df is empty or none
+
+    def is_df_none(self):
+        return self.df is None  
+
+# Class method that extract the list of columns names and store the results in the relevant attribute (self.cols_list) if self.df is not empty nor None 
+
+    def set_columns(self):
+        if not self.is_df_none():
+            self.cols_list = list(self.df.columns)    
+
+# Class method that computes the dimensions (number of columns and rows) of self.df  and store the results in the relevant attributes (self.n_rows, self.n_cols) if self.df is not empty nor None 
+    def set_dimensions(self):
+        if not self.is_df_none():
+            self.n_rows, self.n_cols = self.df.shape 
+#  Class method that computes the number of duplicated of self.df and store the results in the relevant attribute (self.n_duplicates) if self.df is not empty nor None   
+
+    def set_duplicates(self):
+        if not self.is_df_none():
+            self.n_duplicates = len(self.df) - len(self.df.drop_duplicates())
+
+# Class method that computes the number of missing values of self.df and store the results in the relevant attribute (self.n_missing) if self.df is not empty nor None 
 
     def set_missing(self):
-        self.n_missing = self.serie.isnull().sum()
+        if not self.is_df_none():
+            self.n_missing = self.df.isnull().sum().sum()
 
-    def set_empty(self):
-        self.n_empty = (self.serie == '').sum()
+# Class method that computes the number of columns that are numeric type and store the results in the relevant attribute (self.n_num_cols) if self.df is not empty nor None 
 
-    def set_mode(self):
-        self.n_mode = self.serie.mode().iloc[0]
+    def set_numeric(self):
+        if not self.is_df_none():
+            numeric_cols = self.df.select_dtypes(include=['number']).columns
+            self.n_num_cols = len(numeric_cols)
 
-    def set_whitespace(self):
-        self.n_space = self.serie.apply(lambda x: x.isspace()).sum()
+# Class method that computes the number of columns that are text type and store the results in the relevant attribute (self.n_text_cols) if self.df is not empty nor None 
 
-    def set_lowercase(self):
-        self.n_lower = self.serie.str.islower().sum()
+    def set_text(self):
+        if not self.is_df_none():
+            text_cols = self.df.select_dtypes(include=['object']).columns
+            self.n_text_cols = len(text_cols)
 
-    def set_uppercase(self):
-        self.n_upper = self.serie.str.isupper().sum()
+# Class method that computes the first rows of self.df according to the provided number of rows specified as parameter (default: 5) if self.df is not empty nor None
 
-    def set_alphabet(self):
-        self.n_alpha = self.serie.apply(lambda x: x.isalpha()).sum()
+    def get_head(self, n=5):
+        if not self.is_df_none():
+            return self.df.head(n)
 
-    def set_digit(self):
-        self.n_digit = self.serie.apply(lambda x: x.isdigit()).sum()
+# Class method that computes the last rows of self.df according to the provided number of rows specified as parameter (default: 5) if self.df is not empty nor None
 
-    def set_barchart(self):
-        print(self.serie.reset_index())
-        chart = alt.Chart(self.serie.reset_index(), height=200).mark_bar().encode(
-            x=alt.X('SalePrice:Q', title='Values', bin=True),
-            #y=alt.Y('count()', title='Count',bin=True),
-            y='count()',
-            #tooltip=['SalePrice:Q', 'count()']
-        ).interactive()
+    def get_tail(self, n=5):
+        if not self.is_df_none():
+            return self.df.tail(n)
+# Class method that computes a random sample of rows of self.df according to the provided number of rows specified as parameter (default: 5) if self.df is not empty nor None
 
-        self.barchart = chart
+    def get_sample(self, n=5):
+        if not self.is_df_none():
+            return self.df.sample(n)
 
-    def set_frequent(self, end=20):
-        value_counts = self.serie.value_counts().head(end).reset_index()
-        value_counts.columns = ['value', 'occurrence']
-        value_counts['percentage'] = (value_counts['occurrence'] / len(self.serie)) * 100
+# Class method that computes the Dataframe containing the list of columns with their data types and memory usage and store the results in the relevant attribute (self.table) if self.df is not empty nor None
+    
+    def set_table(self):
+        if not self.is_df_none():
+          self.table = pd.DataFrame({'column': self.cols_list})
+          self.table['data_type'] = self.df.dtypes.values
 
-        self.frequent = value_counts
+        # Calculate memory usage for each column
+          memory_usage = []
+          for column in self.cols_list:
+             mem = self.df[column].memory_usage(deep=True, index=False) / (1024 * 1024)  # Calculate memory usage in MB
+             memory_usage.append(f"{mem:.2f} MB")  # Format memory usage to display as "X.XX MB"
+
+          self.table['memory'] = memory_usage
+
+
+# Class method that formats all requested information from self.df to be displayed in the Dataframe tab of Streamlit app as a Pandas dataframe with 2 columns: Description and Value
 
     def get_summary(self):
-        summary_data = [
-            ("Number of Unique Values", self.n_unique),
-            ("Number of Rows with Missing Values", self.n_missing),
-            ("Number of Empty Rows", self.n_empty),
-            ("Number of Rows with Only Whitespaces", self.n_space),
-            ("Number of Rows with Only Lowercases", self.n_lower),
-            ("Number of Rows with Only Uppercases", self.n_upper),
-            ("Number of  Rows with Alphabets", self.n_alpha),
-            ("Number of Rows with Numbers", self.n_digit),
-            ("Mode Value", self.n_mode),
-        ]
+        summary_data = {
+            'Description': ['Number of Rows', 'Number of Columns', 'Number of Duplicated Rows',
+                            'Number of Rows with Missing Values', 'Number of Numeric Columns',
+                            'Number of Text Columns'],
+            'Value': [self.n_rows, self.n_cols, self.n_duplicates, self.n_missing,
+                      self.n_num_cols, self.n_text_cols]
+        }
+        return pd.DataFrame(summary_data, columns=['Description', 'Value'])
 
-        summary_df = pd.DataFrame(summary_data, columns=['Description', 'Value'])
-        return summary_df
