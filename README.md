@@ -1,29 +1,46 @@
-DSP_Assignment_3-Group_6
+# Data Explore Web App using Streamlit
 
-# Data Explore Web App using stramlit
+## Authors
+Group 6: 
+- Anna Roy ()
+- Sangmeshwar Kanaje (24896538)
+- Savanth Nair ()
+- Junjie Zou ()
 
-This Streamlit application allows users to upload a CSV file and perform exploratory data analysis.
+## Description
+This application allows users to upload and explore data through a user-friendly web interface. Built with Streamlit, it simplifies data analysis tasks, offering intuitive insights into uploaded datasets. Challenges faced included handling various data types and creating a responsive user interface. Future enhancements may include advanced data visualization tools and machine learning capabilities for predictive analysis.
 
-## Features
+## How to Setup
+To set up this project:
+1. Ensure you have Python 3.9 installed.
+2. Clone the repository to your local machine.
+3. Install dependencies using `pip install -r requirements.txt` in your project directory.
 
-- Upload CSV file and preview its content
-- Explore overall information about the dataset
-- Perform analysis on numeric, text, and datetime columns
+### Python Version
+- Python 3.9
 
-## Installation
+### Packages and Versions
+- Streamlit 1.8.0
+- Pandas 1.3.5
+- Numpy 1.21.4
 
-To run this app, you'll need Python 3.9 and pip installed.
 
-1. Clone this repository.
-2. Install the required libraries with `pip install -r requirements.txt`.
-3. Run the app with `streamlit run app.py'.
+## How to Run the Program
+To run the program:
+1. Navigate to the project directory.
+2. Run `streamlit run app.py`.
+3. Open a web browser and go to the local server address provided by Streamlit.
 
-## Usage
+## Project Structure
+- `/app.py`: The main Streamlit application script.
+- `/requirements.txt`: Lists all the necessary Python packages.
+- `/data`: Folder for sample CSV files (if applicable).
+- `/utils`: Contains utility scripts for data processing.
+- `/README.md`: This documentation.
 
-After running the app, navigate to the Streamlit interface in your web browser and follow the instructions within the app to upload and analyze your CSV data.
+## Citations
+- Streamlit Documentation: https://docs.streamlit.io/library/api-reference/charts
+- Pandas Documentation: https://pandas.pydata.org/docs/
+- GitHub : https://docs.github.com/
 
-Group Members:
--> Anna Roy
--> Sangmeshwar Kanaje
--> Savanth Nair
--> Junjie Zou
+---
