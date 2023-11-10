@@ -43,7 +43,7 @@ class TextColumn:
         self.set_uppercase()
         self.set_alphabet()
         self.set_digit()
-        self.set_barchart()
+        self.set_barchart(col_name)
         self.set_frequent()
 
     def convert_serie_to_text(self):
@@ -79,10 +79,10 @@ class TextColumn:
     def set_digit(self):
         self.n_digit = self.serie.apply(lambda x: x.isdigit()).sum()
 
-    def set_barchart(self):
+    def set_barchart(self,col_name):
         print(self.serie.reset_index())
         chart = alt.Chart(self.serie.reset_index(), height=200).mark_bar().encode(
-            x=alt.X('SalePrice:Q', title='Values', bin=True),
+            x=alt.X(col_name+':Q', title='Values', bin=True),
             #y=alt.Y('count()', title='Count',bin=True),
             y='count()',
             #tooltip=['SalePrice:Q', 'count()']
