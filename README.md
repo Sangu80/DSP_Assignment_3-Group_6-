@@ -34,8 +34,8 @@ To run the program:
 ## Project Structure
 - `/app.py`: The main Streamlit application script.
 - `/requirements.txt`: Lists all the necessary Python packages.
-- `/data`: Folder for sample CSV files (if applicable).
-- `/utils`: Contains utility scripts for data processing.
+- `/CSV`: Folder for sample CSV files.
+- `/tab_num and /tab_df and /tab_date and tab_text`: Contains utility scripts for data processing.
 - `/README.md`: This documentation.
 
 ## Citations
