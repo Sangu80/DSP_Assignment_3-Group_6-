@@ -1,6 +1,6 @@
 import streamlit as st
 
-from logics import Dataset
+from tab_df.logics import Dataset
 
 def display_tab_df_content(file_path):
     # Instantiate the Dataset class and set the data

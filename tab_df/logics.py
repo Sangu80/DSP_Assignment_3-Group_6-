@@ -102,7 +102,7 @@ class Dataset:
              mem = self.df[column].memory_usage(deep=True, index=False) / (1024 * 1024)  # Calculate memory usage in MB
              memory_usage.append(f"{mem:.2f} MB")  # Format memory usage to display as "X.XX MB"
 
-          self.table['memory'] = memory_usage
+          self.table['Memory'] = memory_usage
 
 
 # Class method that formats all requested information from self.df to be displayed in the Dataframe tab of Streamlit app as a Pandas dataframe with 2 columns: Description and Value
