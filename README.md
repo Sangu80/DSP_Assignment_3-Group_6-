@@ -36,6 +36,8 @@ To run the program:
 - `/requirements.txt`: Lists all the necessary Python packages.
 - `/CSV`: Folder for sample CSV files.
 - `/tab_num and /tab_df and /tab_date and tab_text`: Contains utility scripts for data processing.
+- `/display.py`: This script handles the user interface elements of the application. It includes functions for displaying data tables, charts, and other visual elements in the Streamlit app.
+- `/logic.py`: Contains the core logic and data processing functions. It includes methods for data analysis, manipulation, and computations that are called by the Streamlit interface.
 - `/README.md`: This documentation.
 
 ## Citations
