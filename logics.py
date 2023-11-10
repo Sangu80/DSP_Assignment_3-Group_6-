@@ -26,7 +26,7 @@ class TextColumn:
             self.df = pd.read_csv(self.file_path)
 
         if self.df is not None:
-            self.cols_list = [col for col in self.df.columns if self.df[col].dtype == 'object']
+            self.cols_list = [col for col in self.df.columns if self.df[col].dtype == 'int64']
 
     def set_data(self, col_name):
         self.serie = self.df[col_name] if col_name in self.df.columns else None
@@ -80,10 +80,12 @@ class TextColumn:
         self.n_digit = self.serie.apply(lambda x: x.isdigit()).sum()
 
     def set_barchart(self):
-        chart = alt.Chart(self.serie.reset_index(), height=300).mark_bar().encode(
-            x=alt.X('index:N', title='Values'),
-            y=alt.Y('count()', title='Count'),
-            tooltip=['index:N', 'count()']
+        print(self.serie.reset_index())
+        chart = alt.Chart(self.serie.reset_index(), height=200).mark_bar().encode(
+            x=alt.X('SalePrice:Q', title='Values', bin=True),
+            #y=alt.Y('count()', title='Count',bin=True),
+            y='count()',
+            #tooltip=['SalePrice:Q', 'count()']
         ).interactive()
 
         self.barchart = chart
@@ -98,14 +100,14 @@ class TextColumn:
     def get_summary(self):
         summary_data = [
             ("Number of Unique Values", self.n_unique),
-            ("Number of Missing Values", self.n_missing),
-            ("Number of Empty Values", self.n_empty),
+            ("Number of Rows with Missing Values", self.n_missing),
+            ("Number of Empty Rows", self.n_empty),
+            ("Number of Rows with Only Whitespaces", self.n_space),
+            ("Number of Rows with Only Lowercases", self.n_lower),
+            ("Number of Rows with Only Uppercases", self.n_upper),
+            ("Number of  Rows with Alphabets", self.n_alpha),
+            ("Number of Rows with Numbers", self.n_digit),
             ("Mode Value", self.n_mode),
-            ("Number of Whitespace Values", self.n_space),
-            ("Number of Lowercase Values", self.n_lower),
-            ("Number of Uppercase Values", self.n_upper),
-            ("Number of Alphabetical Values", self.n_alpha),
-            ("Number of Numeric Values", self.n_digit)
         ]
 
         summary_df = pd.DataFrame(summary_data, columns=['Description', 'Value'])
