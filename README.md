@@ -2,10 +2,10 @@
 
 ## Authors
 Group 6: 
-- Anna Roy ()
+- Anna Roy (24886234)
 - Sangmeshwar Kanaje (24896538)
-- Savanth Nair ()
-- Junjie Zou ()
+- Savanth Nair (24891626)
+- Junjie Zou (14360945)
 
 ## Description
 This application allows users to upload and explore data through a user-friendly web interface. Built with Streamlit, it simplifies data analysis tasks, offering intuitive insights into uploaded datasets. Challenges faced included handling various data types and creating a responsive user interface. Future enhancements may include advanced data visualization tools and machine learning capabilities for predictive analysis.
